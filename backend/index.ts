@@ -1,15 +1,17 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
+import express, { Express, Request, Response } from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
 
-const app = express();
+dotenv.config();
+
+const app: Express = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Basic route
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res: Response) => {
     res.json({ message: 'Welcome to Task Manager API' });
 });
 

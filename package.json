@@ -1,0 +1,30 @@
+{
+  "name": "task-manager",
+  "version": "1.0.0",
+  "description": "Task Manager Application with separate frontend and backend",
+  "scripts": {
+    "prepare": "husky",
+    "lint": "npm run lint:backend && npm run lint:frontend",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:frontend": "cd frontend && npm run lint",
+    "format": "npm run format:backend && npm run format:frontend",
+    "format:backend": "cd backend && npm run format",
+    "format:frontend": "cd frontend && npm run format",
+    "lint-staged": "lint-staged"
+  },
+  "lint-staged": {
+    "backend/**/*.{ts,js,json}": [
+      "prettier --write --ignore-unknown",
+      "eslint --fix"
+    ],
+    "frontend/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --write --ignore-unknown"
+    ]
+  },
+  "devDependencies": {
+    "eslint": "^9.21.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "prettier": "^3.5.2"
+  }
+}
