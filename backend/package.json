@@ -21,6 +21,8 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@prisma/client": "^6.4.1",
+        "@prisma/extension-accelerate": "^1.2.2",
         "cors": "^2.8.5",
         "dotenv": "^16.4.7",
         "express": "^4.21.2"
@@ -36,6 +38,7 @@
         "lint-staged": "^15.4.3",
         "nodemon": "^3.1.9",
         "prettier": "3.5.2",
+        "prisma": "^6.4.1",
         "ts-node": "^10.9.2",
         "typescript": "^5.7.3",
         "typescript-eslint": "^8.25.0"
