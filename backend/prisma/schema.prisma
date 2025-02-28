@@ -6,3 +6,64 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// Enums
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+// Models
+model User {
+  id       String  @id @default(uuid())
+  email    String  @unique
+  password String
+  roleId   String
+  role     Role    @relation(fields: [roleId], references: [id])
+  tasks    Task[]  @relation("TaskCreator")
+
+  @@map("users")
+}
+
+model Role {
+  id    String @id @default(uuid())
+  name  String @unique
+  users User[]
+
+  @@map("roles")
+}
+
+model TaskCategory {
+  id    String @id @default(uuid())
+  name  String @unique
+  tasks Task[]
+
+  @@map("task_categories")
+}
+
+model TaskPriority {
+  id    String @id @default(uuid())
+  name  String @unique
+  tasks Task[]
+
+  @@map("task_priorities")
+}
+
+model Task {
+  id          String      @id @default(uuid())
+  title       String
+  description String?
+  status      TaskStatus  @default(PENDING)
+  priority    TaskPriority @relation(fields: [priorityId], references: [id])
+  priorityId  String
+  dueDate     DateTime?
+  createdBy   User        @relation("TaskCreator", fields: [createdById], references: [id])
+  createdById String
+  category    TaskCategory @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("tasks")
+}
