@@ -4,10 +4,12 @@
         "module": "commonjs",
         "outDir": "./dist",
         "rootDir": "./",
-        "strict": true,
+        "strict": false,
         "esModuleInterop": true,
         "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
     },
     "include": ["./**/*"],
     "exclude": ["node_modules", "dist"]
