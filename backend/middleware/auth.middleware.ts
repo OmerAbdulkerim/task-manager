@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { Secret } from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { JWT_CONFIG } from '../config/jwt.config';
 
@@ -14,13 +14,25 @@ declare global {
     }
 }
 
+/**
+ * Authenticate user
+ *
+ * @remarks
+ * This route is protected and requires authentication.
+ * The function checks if the user is authenticated and
+ * returns a new access token.
+ *
+ * @param req - The request object
+ * @param res - The response object
+ * @param next - The next function
+ * @returns The refreshed access token
+ */
 export async function authenticate(
     req: Request,
     res: Response,
     next: NextFunction,
 ) {
     try {
-        // Get token from header
         const authHeader = req.headers.authorization;
 
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -33,11 +45,13 @@ export async function authenticate(
 
         // Verify token
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, JWT_CONFIG.SECRET) as {
+        const decoded = jwt.verify(
+            token,
+            JWT_CONFIG.ACCESS_TOKEN.SECRET as Secret,
+        ) as {
             userId: string;
         };
 
-        // Find user by id
         const user = await prisma.user.findUnique({
             where: { id: decoded.userId },
             include: { role: true },
@@ -56,6 +70,17 @@ export async function authenticate(
         next();
     } catch (error) {
         console.error('Auth error:', error);
+
+        // Check if error is due to token expiration
+        if (error instanceof jwt.TokenExpiredError) {
+            res.status(401).json({
+                status: 'error',
+                message: 'Access token expired',
+                code: 'TOKEN_EXPIRED',
+            });
+            return;
+        }
+
         res.status(401).json({
             status: 'error',
             message: 'Invalid token. Please log in again.',
@@ -63,6 +88,16 @@ export async function authenticate(
     }
 }
 
+/**
+ * Authorize user
+ *
+ * @remarks
+ * This middleware checks if the user is authenticated and
+ * has the required role to access the route.
+ *
+ * @param roles - The roles that are allowed to access the route
+ * @returns The authorize middleware
+ */
 export function authorize(roles: string[]) {
     return (req: Request, res: Response, next: NextFunction) => {
         if (!req.user) {

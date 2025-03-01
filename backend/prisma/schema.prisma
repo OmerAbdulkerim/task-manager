@@ -16,12 +16,13 @@ enum TaskStatus {
 
 // Models
 model User {
-  id       String  @id @default(uuid())
-  email    String  @unique
-  password String
-  roleId   String
-  role     Role    @relation(fields: [roleId], references: [id])
-  tasks    Task[]  @relation("TaskCreator")
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  roleId        String
+  role          Role           @relation(fields: [roleId], references: [id])
+  tasks         Task[]         @relation("TaskCreator")
+  refreshTokens RefreshToken[]
 
   @@map("users")
 }
@@ -66,4 +67,17 @@ model Task {
   updatedAt   DateTime    @updatedAt
 
   @@map("tasks")
+}
+
+model RefreshToken {
+  id        String   @id
+  token     String?
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("refresh_tokens")
 }
