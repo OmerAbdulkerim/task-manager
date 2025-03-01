@@ -17,7 +17,8 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "prepare": "husky",
         "prisma:seed": "ts-node prisma/seed.ts",
-        "seed:roles": "ts-node prisma/seed-roles.ts"
+        "seed:roles": "ts-node prisma/seed-roles.ts",
+        "seed:task-metadata": "ts-node prisma/seed-task-metadata.ts"
     },
     "keywords": [],
     "author": "",
