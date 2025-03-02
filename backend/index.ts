@@ -7,6 +7,7 @@ import authRoutes from './routes/auth.routes';
 import protectedRoutes from './routes/protected.routes';
 import taskRoutes from './routes/task.routes';
 import adminRoutes from './routes/admin.routes';
+import commentRoutes from './routes/comment.routes';
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/protected', protectedRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/comments', commentRoutes);
 
 // Basic route
 app.get('/', (req: Request, res: Response) => {

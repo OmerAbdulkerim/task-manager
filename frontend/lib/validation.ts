@@ -62,3 +62,14 @@ export const userSchema = z.object({
 });
 
 export type UserFormValues = z.infer<typeof userSchema>;
+
+// Comment validation schema
+export const commentSchema = z.object({
+  content: z
+    .string()
+    .min(1, { message: 'Comment cannot be empty' })
+    .max(1000, { message: 'Comment must be less than 1000 characters' }),
+  taskId: z.number().int().positive({ message: 'Invalid task ID' }),
+});
+
+export type CommentFormValues = z.infer<typeof commentSchema>;

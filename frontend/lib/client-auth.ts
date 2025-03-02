@@ -88,7 +88,7 @@ export async function loginUser(
 export async function registerUser(
   email: string,
   password: string,
-  roleId: string = '1',
+  roleId: string = '2',
 ): Promise<AuthResponse> {
   try {
     const response = await fetch(`${API_URL}/auth/register`, {

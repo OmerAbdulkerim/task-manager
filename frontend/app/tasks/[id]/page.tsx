@@ -15,6 +15,7 @@ import {
   TaskCategory,
 } from '@/lib/task-service';
 import { EditTaskDialog } from '@/components/edit-task-dialog';
+import { CommentList } from '@/components/comments/comments-list';
 import {
   Dialog,
   DialogContent,
@@ -251,6 +252,9 @@ export default function TaskDetailPage() {
               </div>
             </div>
           </div>
+
+          {/* Comments Section */}
+          <CommentList taskId={task.id} />
         </div>
       </div>
 
