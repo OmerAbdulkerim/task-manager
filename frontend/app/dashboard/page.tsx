@@ -109,7 +109,7 @@ export default function DashboardPage() {
     setIsEditDialogOpen(true);
   };
 
-  const handleDeleteTask = async (taskId: number) => {
+  const handleDeleteTask = async (taskId: string) => {
     try {
       setLoading(true);
       await deleteTask(taskId);

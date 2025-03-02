@@ -1,0 +1,3 @@
+{
+  "buildCommand": "cross-env NODE_ENV=development npm install && cross-env NODE_ENV=production next build"
+}

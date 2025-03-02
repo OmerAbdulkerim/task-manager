@@ -57,7 +57,7 @@ export default function TaskDetailPage() {
 
   const handleDeleteTask = async () => {
     try {
-      await deleteTask(Number(taskId));
+      await deleteTask(taskId);
       router.push('/dashboard');
     } catch (err: any) {
       console.error('Error deleting task:', err);

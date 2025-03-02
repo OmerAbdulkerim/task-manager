@@ -9,7 +9,7 @@ export interface User {
   email: string;
   name?: string;
   role?: {
-    id: string;
+    id: number;
     name: string;
   };
 }

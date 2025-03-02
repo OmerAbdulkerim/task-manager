@@ -51,7 +51,7 @@ export interface User {
 
 // Main Task interface that matches the backend model
 export interface Task {
-  id: number;
+  id: string;
   title: string;
   description?: string | null;
   status: TaskStatus;
@@ -251,7 +251,7 @@ export async function updateTask(
 /**
  * Delete a task
  */
-export async function deleteTask(id: number): Promise<void> {
+export async function deleteTask(id: string): Promise<void> {
   try {
     const token = getAccessToken();
 
