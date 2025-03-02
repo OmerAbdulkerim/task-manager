@@ -17,11 +17,8 @@ const app: Express = express();
 app.use(
     cors({
         origin: [
-            'http://localhost:3000',
-            'http://127.0.0.1:3000',
             'https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3--3000--31ca1d38.local-credentialless.webcontainer-api.io',
-            'https://task-manager-frontend.vercel.app',
-            process.env.FRONTEND_URL, // Allow configuration via environment variable
+            'https://task-manager-frontend-sepia-delta.vercel.app',
         ], // Explicit origins for Next.js frontend
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Allow all methods
         allowedHeaders: [
