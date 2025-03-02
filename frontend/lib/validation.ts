@@ -38,3 +38,27 @@ export const taskSchema = z.object({
 });
 
 export type TaskFormValues = z.infer<typeof taskSchema>;
+
+// User validation schema
+export const userSchema = z.object({
+  email: z
+    .string()
+    .email({ message: 'Please enter a valid email address' })
+    .min(5, { message: 'Email must be at least 5 characters long' })
+    .max(100, { message: 'Email must be less than 100 characters' }),
+  password: z
+    .string()
+    .min(8, { message: 'Password must be at least 8 characters long' })
+    .max(100, { message: 'Password must be less than 100 characters' })
+    .optional(),
+  name: z
+    .string()
+    .min(2, { message: 'Name must be at least 2 characters long' })
+    .max(100, { message: 'Name must be less than 100 characters' })
+    .optional(),
+  roleId: z
+    .union([z.string(), z.number()])
+    .refine((val) => val !== '', { message: 'Please select a role' }),
+});
+
+export type UserFormValues = z.infer<typeof userSchema>;

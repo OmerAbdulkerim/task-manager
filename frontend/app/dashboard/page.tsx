@@ -15,6 +15,8 @@ import {
 import { TaskCard } from '@/components/task-card';
 import { CreateTaskDialog } from '@/components/create-task-dialog';
 import { EditTaskDialog } from '@/components/edit-task-dialog';
+import { Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -27,6 +29,9 @@ export default function DashboardPage() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [dashboardData, setDashboardData] = useState<any>(null);
+
+  // Check if user is admin
+  const isAdmin = user?.role?.id === 1;
 
   // Mock data for categories and priorities - in a real app, these would be fetched from the API
   const [categories, setCategories] = useState<TaskCategory[]>([
@@ -165,11 +170,23 @@ export default function DashboardPage() {
       <main className="container mx-auto px-4 py-6">
         <div className="mb-6 flex flex-col items-center justify-between md:flex-row">
           <h1 className="text-3xl font-bold">Dashboard</h1>
-          <CreateTaskDialog
-            categories={categories}
-            priorities={priorities}
-            onTaskCreated={handleTaskCreated}
-          />
+          <div className="mt-4 flex space-x-4 md:mt-0">
+            {isAdmin && (
+              <Button
+                variant="outline"
+                className="flex items-center gap-2"
+                onClick={() => router.push('/admin/users')}
+              >
+                <Users className="h-4 w-4" />
+                Manage Users
+              </Button>
+            )}
+            <CreateTaskDialog
+              categories={categories}
+              priorities={priorities}
+              onTaskCreated={handleTaskCreated}
+            />
+          </div>
         </div>
 
         {/* Display error message if there is one */}

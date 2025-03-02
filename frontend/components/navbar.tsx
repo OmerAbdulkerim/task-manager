@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/auth-store';
 import { logoutUser } from '@/lib/client-auth';
+import { Users } from 'lucide-react';
 
 export function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -14,6 +15,9 @@ export function Navbar() {
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const logout = useAuthStore((state) => state.logout);
+
+  // Check if user is admin
+  const isAdmin = user?.role?.id === 1;
 
   useEffect(() => {
     setMounted(true);
@@ -80,6 +84,17 @@ export function Navbar() {
                 >
                   Dashboard
                 </Link>
+
+                {/* Admin-only links */}
+                {isAdmin && (
+                  <Link
+                    href="/admin/users"
+                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                  >
+                    <Users className="mr-1 h-4 w-4" />
+                    User Management
+                  </Link>
+                )}
               </div>
             )}
           </div>

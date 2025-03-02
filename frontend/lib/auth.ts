@@ -6,7 +6,7 @@ export interface User {
   id: string;
   email: string;
   role?: {
-    id: string;
+    id: number;
     name: string;
   };
 }
