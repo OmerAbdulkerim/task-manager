@@ -29,13 +29,7 @@ export default function LoginPage() {
   const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
-    console.log('Login page: Authentication state =', isAuthenticated);
-    console.log('Login page: User =', user ? 'exists' : 'missing');
-
     if (isAuthenticated && user) {
-      console.log(
-        'Login page: Already authenticated, redirecting to dashboard',
-      );
       router.push('/dashboard');
     }
   }, [isAuthenticated, user, router]);
@@ -57,6 +51,7 @@ export default function LoginPage() {
     try {
       const response = await loginUser(email, password);
 
+      // Store login information in the auth store
       login(response.data.user, response.data.accessToken);
 
       setTimeout(() => {

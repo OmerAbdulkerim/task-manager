@@ -54,12 +54,17 @@ export async function loginUser(
     }
 
     const result = await response.json();
-    console.log('loginUser: Login successful, result:', {
-      status: result.status,
-      message: result.message,
-      user: result.data?.user ? 'exists' : 'missing',
-      token: result.data?.accessToken ? 'exists' : 'missing',
-    });
+
+    // Store the token in localStorage for use in API requests
+    if (result.data?.accessToken) {
+      localStorage.setItem('accessToken', result.data.accessToken);
+
+      // Also set as a cookie for redundancy
+      const secure = process.env.NODE_ENV === 'production';
+      document.cookie = `accessToken=${result.data.accessToken}; path=/; ${secure ? 'secure; ' : ''}samesite=strict; max-age=86400`; // 24 hours
+    } else {
+      console.error('No access token received from server');
+    }
 
     return result;
   } catch (err) {
@@ -115,6 +120,9 @@ export async function registerUser(
  */
 export async function logoutUser(): Promise<void> {
   try {
+    // Remove the token from localStorage
+    localStorage.removeItem('accessToken');
+
     await fetch(`${API_URL}/auth/logout`, {
       method: 'POST',
       credentials: 'include',

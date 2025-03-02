@@ -21,7 +21,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const authData = localStorage.getItem('auth-storage');
       if (authData) {
         try {
-          console.log('Auth provider: localStorage check:', children);
           const parsed = JSON.parse(authData);
         } catch (e) {
           console.error('Auth provider: Error parsing localStorage:', e);

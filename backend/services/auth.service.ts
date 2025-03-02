@@ -35,7 +35,7 @@ export class AuthService {
     }: {
         email: string;
         password: string;
-        roleId: string;
+        roleId: number;
     }) {
         try {
             const existingUser = await prisma.user.findUnique({

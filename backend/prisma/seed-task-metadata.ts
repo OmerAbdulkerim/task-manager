@@ -34,10 +34,10 @@ async function seedTaskMetadata() {
 
         // Create task priorities if they don't exist
         const priorities = [
-            { name: 'Low' },
-            { name: 'Medium' },
-            { name: 'High' },
-            { name: 'Urgent' },
+            { name: 'LOW' },
+            { name: 'MEDIUM' },
+            { name: 'HIGH' },
+            { name: 'URGENT' },
         ];
 
         console.log('Seeding task priorities...');

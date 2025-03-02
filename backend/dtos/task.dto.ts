@@ -2,9 +2,9 @@ import {
     IsDate,
     IsEnum,
     IsNotEmpty,
+    IsNumber,
     IsOptional,
     IsString,
-    IsUUID,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { TaskStatus } from '@prisma/client';
@@ -22,13 +22,15 @@ export class CreateTaskDto {
     @IsOptional()
     status?: TaskStatus;
 
-    @IsUUID('all', { message: 'Priority ID must be a valid UUID' })
+    @IsNumber({}, { message: 'Priority ID must be a number' })
+    @Type(() => Number)
     @IsNotEmpty({ message: 'Priority ID is required' })
-    priorityId: string = '';
+    priorityId: number = 0;
 
-    @IsUUID('all', { message: 'Category ID must be a valid UUID' })
+    @IsNumber({}, { message: 'Category ID must be a number' })
+    @Type(() => Number)
     @IsNotEmpty({ message: 'Category ID is required' })
-    categoryId: string = '';
+    categoryId: number = 0;
 
     @IsOptional()
     @Type(() => Date)
@@ -49,13 +51,15 @@ export class UpdateTaskDto {
     @IsOptional()
     status?: TaskStatus;
 
-    @IsUUID('all', { message: 'Priority ID must be a valid UUID' })
+    @IsNumber({}, { message: 'Priority ID must be a number' })
+    @Type(() => Number)
     @IsOptional()
-    priorityId?: string;
+    priorityId?: number;
 
-    @IsUUID('all', { message: 'Category ID must be a valid UUID' })
+    @IsNumber({}, { message: 'Category ID must be a number' })
+    @Type(() => Number)
     @IsOptional()
-    categoryId?: string;
+    categoryId?: number;
 
     @IsOptional()
     @Type(() => Date)
@@ -65,8 +69,9 @@ export class UpdateTaskDto {
 
 export class TaskFilterDto {
     @IsOptional()
-    @IsString({ each: true })
-    priorityIds?: string[];
+    @IsNumber({}, { each: true })
+    @Type(() => Number)
+    priorityIds?: number[];
 
     @IsOptional()
     @IsEnum(TaskStatus, { each: true })

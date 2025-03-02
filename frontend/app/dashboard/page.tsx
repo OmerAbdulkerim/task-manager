@@ -4,38 +4,56 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/navbar';
 import { useAuthStore } from '@/store/auth-store';
-
-interface Task {
-  id: string;
-  title: string;
-  status: string;
-  priority: string;
-  dueDate: string;
-}
-
-interface DashboardData {
-  totalTasks: number;
-  pendingTasks: number;
-  completedTasks: number;
-  recentTasks: Task[];
-}
+import {
+  Task,
+  TaskCategory,
+  TaskPriority,
+  TaskStatus,
+  fetchTasks,
+  deleteTask,
+} from '@/lib/task-service';
+import { TaskCard } from '@/components/task-card';
+import { CreateTaskDialog } from '@/components/create-task-dialog';
+import { EditTaskDialog } from '@/components/edit-task-dialog';
 
 export default function DashboardPage() {
   const router = useRouter();
-  // Use individual selectors to avoid infinite loops
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   const [loading, setLoading] = useState(true);
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
-    null,
-  );
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [error, setError] = useState('');
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [dashboardData, setDashboardData] = useState<any>(null);
+
+  // Mock data for categories and priorities - in a real app, these would be fetched from the API
+  const [categories, setCategories] = useState<TaskCategory[]>([
+    { id: 1, name: 'Work' },
+    { id: 2, name: 'Personal' },
+    { id: 3, name: 'Shopping' },
+  ]);
+
+  const [priorities, setPriorities] = useState<TaskPriority[]>([
+    { id: 1, name: 'LOW' },
+    { id: 2, name: 'MEDIUM' },
+    { id: 3, name: 'HIGH' },
+  ]);
+
+  // Stats derived from tasks - with proper null checks
+  const totalTasks = tasks?.length || 0;
+  const pendingTasks =
+    tasks?.filter((task) => task.status === TaskStatus.PENDING)?.length || 0;
+  const completedTasks =
+    tasks?.filter((task) => task.status === TaskStatus.COMPLETED)?.length || 0;
+  const inProgressTasks =
+    tasks?.filter((task) => task.status === TaskStatus.IN_PROGRESS)?.length ||
+    0;
 
   useEffect(() => {
     // Check authentication - the middleware will handle redirects, but we still check here as a backup
     if (!isAuthenticated || !user) {
-      console.log('Dashboard page: Not authenticated, redirecting to login');
       router.push('/login');
       return;
     }
@@ -53,19 +71,81 @@ export default function DashboardPage() {
         }
 
         const data = await response.json();
-        setDashboardData(data.dashboardData);
+        setDashboardData(data);
       } catch (err) {
-        console.error('Error fetching dashboard data:', err);
         setError('Failed to load dashboard data. Please try again later.');
+      }
+    }
+
+    // Fetch tasks
+    async function loadTasks() {
+      try {
+        const taskData = await fetchTasks();
+        setTasks(taskData);
+        setError('');
+      } catch (err: any) {
+        setError('Failed to load tasks. Please try again later.');
+
+        // If authentication error, redirect to login
+        if (err.message && err.message.includes('Authentication required')) {
+          router.push('/login');
+        }
       } finally {
         setLoading(false);
       }
     }
 
     fetchDashboardData();
+    loadTasks();
   }, [isAuthenticated, user, router]);
 
-  if (loading) {
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteTask = async (taskId: number) => {
+    try {
+      setLoading(true);
+      await deleteTask(taskId);
+      setTasks(tasks.filter((task) => task.id !== taskId));
+    } catch (err: any) {
+      console.error('Error deleting task:', err);
+      setError('Failed to delete task. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTaskCreated = async () => {
+    try {
+      setLoading(true);
+      const taskData = await fetchTasks();
+      setTasks(taskData);
+      setError('');
+    } catch (err: any) {
+      console.error('Error refreshing tasks:', err);
+      setError('Failed to refresh tasks. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTaskUpdated = async () => {
+    try {
+      setLoading(true);
+      const taskData = await fetchTasks();
+      setTasks(taskData);
+      setError('');
+    } catch (err: any) {
+      console.error('Error refreshing tasks:', err);
+      setError('Failed to refresh tasks. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading && !tasks.length) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -79,111 +159,83 @@ export default function DashboardPage() {
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <h1 className="mb-6 text-3xl font-bold">Dashboard</h1>
 
-        {error ? (
-          <div className="relative mb-6 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-            {error}
+      <main className="container mx-auto px-4 py-6">
+        <div className="mb-6 flex flex-col items-center justify-between md:flex-row">
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <CreateTaskDialog
+            categories={categories}
+            priorities={priorities}
+            onTaskCreated={handleTaskCreated}
+          />
+        </div>
+
+        {/* Display error message if there is one */}
+        {error && (
+          <div className="relative mb-6 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
+            <span className="block sm:inline">{error}</span>
+          </div>
+        )}
+
+        {/* Dashboard stats */}
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-lg border-l-4 border-blue-500 bg-white p-4 shadow">
+            <h2 className="font-semibold text-gray-500">Total Tasks</h2>
+            <p className="text-2xl font-bold">{totalTasks}</p>
+          </div>
+          <div className="rounded-lg border-l-4 border-yellow-500 bg-white p-4 shadow">
+            <h2 className="font-semibold text-gray-500">Pending</h2>
+            <p className="text-2xl font-bold">{pendingTasks}</p>
+          </div>
+          <div className="rounded-lg border-l-4 border-purple-500 bg-white p-4 shadow">
+            <h2 className="font-semibold text-gray-500">In Progress</h2>
+            <p className="text-2xl font-bold">{inProgressTasks}</p>
+          </div>
+          <div className="rounded-lg border-l-4 border-green-500 bg-white p-4 shadow">
+            <h2 className="font-semibold text-gray-500">Completed</h2>
+            <p className="text-2xl font-bold">{completedTasks}</p>
+          </div>
+        </div>
+
+        {/* Task list */}
+        <h2 className="mb-4 text-xl font-semibold">Your Tasks</h2>
+
+        {loading ? (
+          <div className="py-10 text-center">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-t-2 border-b-2 border-blue-500"></div>
+            <p className="mt-2 text-gray-500">Loading your tasks...</p>
+          </div>
+        ) : tasks.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {tasks.map((task) => (
+              <TaskCard
+                key={task.id}
+                task={task}
+                onEdit={handleEditTask}
+                onDelete={(e) => handleDeleteTask(task.id)}
+              />
+            ))}
           </div>
         ) : (
-          <>
-            <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
-              <div className="rounded-lg bg-white p-6 shadow">
-                <h3 className="text-lg font-medium text-gray-900">
-                  Tasks Overview
-                </h3>
-                <div className="mt-2 text-3xl font-semibold">
-                  {dashboardData?.totalTasks || 0}
-                </div>
-                <div className="mt-1 text-sm text-gray-500">Total tasks</div>
-              </div>
-
-              <div className="rounded-lg bg-white p-6 shadow">
-                <h3 className="text-lg font-medium text-gray-900">Pending</h3>
-                <div className="mt-2 text-3xl font-semibold">
-                  {dashboardData?.pendingTasks || 0}
-                </div>
-                <div className="mt-1 text-sm text-gray-500">
-                  Tasks to complete
-                </div>
-              </div>
-
-              <div className="rounded-lg bg-white p-6 shadow">
-                <h3 className="text-lg font-medium text-gray-900">Completed</h3>
-                <div className="mt-2 text-3xl font-semibold">
-                  {dashboardData?.completedTasks || 0}
-                </div>
-                <div className="mt-1 text-sm text-gray-500">Finished tasks</div>
-              </div>
-            </div>
-
-            <div className="rounded-lg bg-white p-6 shadow">
-              <h2 className="mb-4 text-xl font-semibold">Recent Tasks</h2>
-              {dashboardData?.recentTasks &&
-              dashboardData.recentTasks.length > 0 ? (
-                <div className="overflow-hidden">
-                  <ul className="divide-y divide-gray-200">
-                    {dashboardData.recentTasks.map((task) => (
-                      <li key={task.id}>
-                        <div className="px-4 py-4">
-                          <div className="flex items-center justify-between">
-                            <p className="truncate text-sm font-medium text-indigo-600">
-                              {task.title}
-                            </p>
-                            <div className="ml-2 flex flex-shrink-0">
-                              <p
-                                className={`inline-flex rounded-full px-2 text-xs leading-5 font-semibold ${
-                                  task.status === 'Completed'
-                                    ? 'bg-green-100 text-green-800'
-                                    : 'bg-yellow-100 text-yellow-800'
-                                }`}
-                              >
-                                {task.status}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="mt-2 sm:flex sm:justify-between">
-                            <div className="sm:flex">
-                              <p className="flex items-center text-sm text-gray-500">
-                                {task.priority} Priority
-                              </p>
-                            </div>
-                            <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                              <p>
-                                {task.status === 'Completed'
-                                  ? 'Completed on '
-                                  : 'Due on '}
-                                {task.dueDate}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : (
-                <p className="text-gray-500">No recent tasks found.</p>
-              )}
-            </div>
-
-            <div className="mt-8 rounded-lg bg-white p-6 shadow">
-              <h2 className="mb-4 text-xl font-semibold">
-                Your Account Information
-              </h2>
-              <p className="mb-2 text-gray-600">
-                Email: <span className="font-medium">{user?.email}</span>
-              </p>
-              <p className="text-gray-600">
-                User ID: <span className="font-medium">{user?.id}</span>
-              </p>
-            </div>
-          </>
+          <div className="rounded-lg bg-white p-6 text-center shadow-md">
+            <p className="text-gray-500">You don't have any tasks yet.</p>
+            <p className="mt-2 text-gray-500">
+              Click the &quot;Create Task&quot; button to get started.
+            </p>
+          </div>
         )}
-      </div>
-    </>
+      </main>
+
+      <EditTaskDialog
+        task={editingTask}
+        categories={categories}
+        priorities={priorities}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onTaskUpdated={handleTaskUpdated}
+      />
+    </div>
   );
 }

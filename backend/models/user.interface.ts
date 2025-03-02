@@ -8,7 +8,7 @@ import { Task } from './task.interface';
 export interface User extends BaseModel {
     email: string;
     password: string;
-    roleId: string;
+    roleId: number;
 
     // Relations
     role?: Role;
@@ -21,7 +21,7 @@ export interface User extends BaseModel {
 export interface UserCreate {
     email: string;
     password: string;
-    roleId: string;
+    roleId: number;
 }
 
 /**
@@ -30,5 +30,5 @@ export interface UserCreate {
 export interface UserUpdate {
     email?: string;
     password?: string;
-    roleId?: string;
+    roleId?: number;
 }

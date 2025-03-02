@@ -6,7 +6,14 @@
  * Base model with ID field
  */
 export interface BaseModel {
-    id: string;
+    id: string | number;
+}
+
+/**
+ * Base model with numeric ID field (for auto-incrementing models)
+ */
+export interface NumericIdModel {
+    id: number;
 }
 
 /**

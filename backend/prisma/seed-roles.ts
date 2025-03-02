@@ -50,18 +50,15 @@ async function seedRoles() {
                     },
                 });
                 console.log('Created admin user');
+            } else {
+                console.error('Admin role not found');
             }
         } else {
             console.log('Admin user already exists');
         }
-
-        console.log('Seeding completed successfully');
     } catch (error) {
         console.error('Error seeding roles:', error);
-    } finally {
-        await prisma.$disconnect();
     }
 }
 
-// Run the seeding function
-seedRoles();
+export default seedRoles;

@@ -1,10 +1,10 @@
-import { BaseModel } from './common.interface';
+import { NumericIdModel } from './common.interface';
 import { User } from './user.interface';
 
 /**
  * Role model interface
  */
-export interface Role extends BaseModel {
+export interface Role extends NumericIdModel {
     name: string;
 
     // Relations

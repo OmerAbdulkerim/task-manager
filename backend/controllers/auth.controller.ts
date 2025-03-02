@@ -21,7 +21,7 @@ export class AuthController {
             const result = await authService.register({
                 email,
                 password,
-                roleId,
+                roleId: Number(roleId),
             });
 
             res.status(201).json({

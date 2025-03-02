@@ -21,7 +21,7 @@ export class TaskService {
         try {
             // Verify category exists
             const category = await prisma.taskCategory.findUnique({
-                where: { id: createTaskDto.categoryId },
+                where: { id: Number(createTaskDto.categoryId) },
             });
 
             if (!category) {
@@ -30,7 +30,7 @@ export class TaskService {
 
             // Verify priority exists
             const priority = await prisma.taskPriority.findUnique({
-                where: { id: createTaskDto.priorityId },
+                where: { id: Number(createTaskDto.priorityId) },
             });
 
             if (!priority) {
@@ -43,8 +43,8 @@ export class TaskService {
                     title: createTaskDto.title,
                     description: createTaskDto.description,
                     status: createTaskDto.status,
-                    priorityId: createTaskDto.priorityId,
-                    categoryId: createTaskDto.categoryId,
+                    priorityId: Number(createTaskDto.priorityId),
+                    categoryId: Number(createTaskDto.categoryId),
                     dueDate: createTaskDto.dueDate,
                     createdById: userId,
                 },
@@ -68,28 +68,25 @@ export class TaskService {
     }
 
     /**
-     * Get all tasks for a user with optional filtering and sorting
+     * Get all tasks with optional filtering
      *
      * @remarks
-     * Method to get all tasks for the currently authenticated user with optional filtering and sorting.
-     * Default sorting is by createdAt in descending order.
-     * Supports filtering and sorting by priority, status, due date, and create date.
+     * Method to get all tasks for the currently authenticated user.
+     * Provides additional filtering options to refine the search based on various criteria.
      *
      * @param userId - The ID of the user
-     * @param filterOptions - The filter options
-     * @returns An array of tasks
+     * @param filterOptions - Optional filtering criteria
+     * @returns An array of tasks matching the criteria
      */
     async getTasks(
         userId: string,
         filterOptions?: TaskFilterDto,
     ): Promise<Task[]> {
         try {
-            // Start with base where clause for user
             const whereClause: any = {
                 createdById: userId,
             };
 
-            // Add filters if provided
             if (filterOptions) {
                 // Filter by priority IDs
                 if (
@@ -97,7 +94,7 @@ export class TaskService {
                     filterOptions.priorityIds.length > 0
                 ) {
                     whereClause.priorityId = {
-                        in: filterOptions.priorityIds,
+                        in: filterOptions.priorityIds.map(Number),
                     };
                 }
 
@@ -153,10 +150,8 @@ export class TaskService {
                     case 'dueDate':
                         orderBy.dueDate = direction;
                         break;
-                    case 'createdAt':
                     default:
                         orderBy.createdAt = direction;
-                        break;
                 }
             } else {
                 orderBy.createdAt = 'desc';
@@ -164,6 +159,7 @@ export class TaskService {
 
             const tasks = await prisma.task.findMany({
                 where: whereClause,
+                orderBy,
                 include: {
                     category: true,
                     priority: true,
@@ -174,7 +170,6 @@ export class TaskService {
                         },
                     },
                 },
-                orderBy: orderBy,
             });
 
             return tasks;
@@ -188,11 +183,13 @@ export class TaskService {
      * Get a task by ID
      *
      * @remarks
-     * Method to get a task by ID for the currently authenticated user.
+     * Method to get a task by its ID for the currently authenticated user.
+     * Needs to have the id of the task to retrieve.
+     * Goes through a series of checks to ensure the task exists and belongs to the user.
      *
      * @param taskId - The ID of the task
      * @param userId - The ID of the user
-     * @returns The task
+     * @returns The task if found, otherwise null
      */
     async getTaskById(taskId: string, userId: string): Promise<Task | null> {
         try {
@@ -259,9 +256,9 @@ export class TaskService {
                 );
             }
 
-            if (updateTaskDto.categoryId) {
+            if (updateTaskDto.categoryId !== undefined) {
                 const category = await prisma.taskCategory.findUnique({
-                    where: { id: updateTaskDto.categoryId },
+                    where: { id: Number(updateTaskDto.categoryId) },
                 });
 
                 if (!category) {
@@ -269,9 +266,9 @@ export class TaskService {
                 }
             }
 
-            if (updateTaskDto.priorityId) {
+            if (updateTaskDto.priorityId !== undefined) {
                 const priority = await prisma.taskPriority.findUnique({
-                    where: { id: updateTaskDto.priorityId },
+                    where: { id: Number(updateTaskDto.priorityId) },
                 });
 
                 if (!priority) {
@@ -292,13 +289,13 @@ export class TaskService {
                     ...(updateTaskDto.status && {
                         status: updateTaskDto.status,
                     }),
-                    ...(updateTaskDto.priorityId && {
-                        priorityId: updateTaskDto.priorityId,
+                    ...(updateTaskDto.priorityId !== undefined && {
+                        priorityId: Number(updateTaskDto.priorityId),
                     }),
-                    ...(updateTaskDto.categoryId && {
-                        categoryId: updateTaskDto.categoryId,
+                    ...(updateTaskDto.categoryId !== undefined && {
+                        categoryId: Number(updateTaskDto.categoryId),
                     }),
-                    ...(updateTaskDto.dueDate && {
+                    ...(updateTaskDto.dueDate !== undefined && {
                         dueDate: updateTaskDto.dueDate,
                     }),
                 },
@@ -327,14 +324,14 @@ export class TaskService {
      * @remarks
      * Method to delete a task for the currently authenticated user.
      * Needs to have the id of the task to delete.
+     * Goes through a series of checks to ensure the task exists and belongs to the user.
      *
      * @param taskId - The ID of the task
      * @param userId - The ID of the user
-     * @returns True if the task was deleted, false otherwise
+     * @returns The deleted task
      */
-    async deleteTask(taskId: string, userId: string): Promise<boolean> {
+    async deleteTask(taskId: string, userId: string): Promise<Task | null> {
         try {
-            // Check if task exists and belongs to the user
             const existingTask = await prisma.task.findUnique({
                 where: {
                     id: taskId,
@@ -351,13 +348,23 @@ export class TaskService {
                 );
             }
 
-            await prisma.task.delete({
+            const deletedTask = await prisma.task.delete({
                 where: {
                     id: taskId,
                 },
+                include: {
+                    category: true,
+                    priority: true,
+                    createdBy: {
+                        select: {
+                            id: true,
+                            email: true,
+                        },
+                    },
+                },
             });
 
-            return true;
+            return deletedTask;
         } catch (error) {
             console.error('Delete task error:', error);
             throw error;

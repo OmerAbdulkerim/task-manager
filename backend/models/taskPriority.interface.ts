@@ -1,10 +1,10 @@
-import { BaseModel } from './common.interface';
+import { NumericIdModel } from './common.interface';
 import { Task } from './task.interface';
 
 /**
  * TaskPriority model interface
  */
-export interface TaskPriority extends BaseModel {
+export interface TaskPriority extends NumericIdModel {
     name: string;
 
     // Relations

@@ -19,7 +19,7 @@ model User {
   id            String         @id @default(uuid())
   email         String         @unique
   password      String
-  roleId        String
+  roleId        Int
   role          Role           @relation(fields: [roleId], references: [id])
   tasks         Task[]         @relation("TaskCreator")
   refreshTokens RefreshToken[]
@@ -28,7 +28,7 @@ model User {
 }
 
 model Role {
-  id    String @id @default(uuid())
+  id    Int    @id @default(autoincrement())
   name  String @unique
   users User[]
 
@@ -36,7 +36,7 @@ model Role {
 }
 
 model TaskCategory {
-  id    String @id @default(uuid())
+  id    Int    @id @default(autoincrement())
   name  String @unique
   tasks Task[]
 
@@ -44,7 +44,7 @@ model TaskCategory {
 }
 
 model TaskPriority {
-  id    String @id @default(uuid())
+  id    Int    @id @default(autoincrement())
   name  String @unique
   tasks Task[]
 
@@ -52,17 +52,17 @@ model TaskPriority {
 }
 
 model Task {
-  id          String      @id @default(uuid())
+  id          String         @id @default(uuid())
   title       String
   description String?
   status      TaskStatus  @default(PENDING)
   priority    TaskPriority @relation(fields: [priorityId], references: [id])
-  priorityId  String
+  priorityId  Int
   dueDate     DateTime?
   createdBy   User        @relation("TaskCreator", fields: [createdById], references: [id])
   createdById String
   category    TaskCategory @relation(fields: [categoryId], references: [id])
-  categoryId  String
+  categoryId  Int
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
