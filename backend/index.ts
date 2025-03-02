@@ -20,6 +20,8 @@ app.use(
             'http://localhost:3000',
             'http://127.0.0.1:3000',
             'https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3--3000--31ca1d38.local-credentialless.webcontainer-api.io',
+            'https://task-manager-frontend.vercel.app',
+            process.env.FRONTEND_URL, // Allow configuration via environment variable
         ], // Explicit origins for Next.js frontend
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Allow all methods
         allowedHeaders: [
@@ -49,7 +51,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
