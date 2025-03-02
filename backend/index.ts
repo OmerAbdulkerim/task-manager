@@ -14,8 +14,21 @@ const app: Express = express();
 // CORS MIDDLEWARE
 app.use(
     cors({
+        origin: [
+            'http://localhost:3000',
+            'http://127.0.0.1:3000',
+            'https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3--3000--31ca1d38.local-credentialless.webcontainer-api.io',
+        ], // Explicit origins for Next.js frontend
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Allow all methods
+        allowedHeaders: [
+            'Content-Type',
+            'Authorization',
+            'X-Requested-With',
+            'Accept',
+        ], // Common headers
         credentials: true, // Allow cookies with CORS
-        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
     }),
 );
 app.use(express.json());

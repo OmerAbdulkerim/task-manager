@@ -62,3 +62,43 @@ export class UpdateTaskDto {
     @IsDate({ message: 'Due date must be a valid date' })
     dueDate?: Date;
 }
+
+export class TaskFilterDto {
+    @IsOptional()
+    @IsString({ each: true })
+    priorityIds?: string[];
+
+    @IsOptional()
+    @IsEnum(TaskStatus, { each: true })
+    statuses?: TaskStatus[];
+
+    @IsOptional()
+    @Type(() => Date)
+    @IsDate()
+    dueDateFrom?: Date;
+
+    @IsOptional()
+    @Type(() => Date)
+    @IsDate()
+    dueDateTo?: Date;
+
+    @IsOptional()
+    @Type(() => Date)
+    @IsDate()
+    createdAtFrom?: Date;
+
+    @IsOptional()
+    @Type(() => Date)
+    @IsDate()
+    createdAtTo?: Date;
+
+    @IsOptional()
+    @IsString()
+    @IsEnum(['asc', 'desc'])
+    sortDirection?: 'asc' | 'desc' = 'desc';
+
+    @IsOptional()
+    @IsString()
+    @IsEnum(['priority', 'status', 'dueDate', 'createdAt'])
+    sortBy?: 'priority' | 'status' | 'dueDate' | 'createdAt' = 'createdAt';
+}
