@@ -7,8 +7,9 @@
         "**/*": "prettier --write --ignore-unknown"
     },
     "scripts": {
-        "build": "tsc && npx prisma generate",
+        "build": "npx prisma generate &&tsc",
         "start": "node dist/index.js",
+        "postinstall": "npx prisma generate",
         "dev": "nodemon --exec ts-node index.ts",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
