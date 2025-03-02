@@ -126,7 +126,7 @@ export function UserForm({ user, roles, onSubmit, onCancel }: UserFormProps) {
           defaultValue={
             String(user?.roleId) || String(roles.length > 0 ? roles[0].id : '')
           }
-          onValueChange={(value) => setValue('roleId', value)}
+          onValueChange={(value) => setValue('roleId', Number(value))}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select role" />

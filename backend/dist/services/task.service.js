@@ -1,16 +1,42 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
+var __awaiter =
+    (this && this.__awaiter) ||
+    function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+            return value instanceof P
+                ? value
+                : new P(function (resolve) {
+                      resolve(value);
+                  });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator['throw'](value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : adopt(result.value).then(fulfilled, rejected);
+            }
+            step(
+                (generator = generator.apply(thisArg, _arguments || [])).next(),
+            );
+        });
+    };
+Object.defineProperty(exports, '__esModule', { value: true });
 exports.TaskService = void 0;
-const client_1 = require("@prisma/client");
+const client_1 = require('@prisma/client');
 const prisma = new client_1.PrismaClient();
 class TaskService {
     /**
@@ -63,8 +89,7 @@ class TaskService {
                     },
                 });
                 return task;
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Create task error:', error);
                 throw error;
             }
@@ -89,15 +114,19 @@ class TaskService {
                 };
                 if (filterOptions) {
                     // Filter by priority IDs
-                    if (filterOptions.priorityIds &&
-                        filterOptions.priorityIds.length > 0) {
+                    if (
+                        filterOptions.priorityIds &&
+                        filterOptions.priorityIds.length > 0
+                    ) {
                         whereClause.priorityId = {
                             in: filterOptions.priorityIds.map(Number),
                         };
                     }
                     // Filter by statuses
-                    if (filterOptions.statuses &&
-                        filterOptions.statuses.length > 0) {
+                    if (
+                        filterOptions.statuses &&
+                        filterOptions.statuses.length > 0
+                    ) {
                         whereClause.status = {
                             in: filterOptions.statuses,
                         };
@@ -113,18 +142,27 @@ class TaskService {
                         }
                     }
                     // Filter by creation date range
-                    if (filterOptions.createdAtFrom || filterOptions.createdAtTo) {
+                    if (
+                        filterOptions.createdAtFrom ||
+                        filterOptions.createdAtTo
+                    ) {
                         whereClause.createdAt = {};
                         if (filterOptions.createdAtFrom) {
-                            whereClause.createdAt.gte = filterOptions.createdAtFrom;
+                            whereClause.createdAt.gte =
+                                filterOptions.createdAtFrom;
                         }
                         if (filterOptions.createdAtTo) {
-                            whereClause.createdAt.lte = filterOptions.createdAtTo;
+                            whereClause.createdAt.lte =
+                                filterOptions.createdAtTo;
                         }
                     }
                 }
                 const orderBy = {};
-                if (filterOptions === null || filterOptions === void 0 ? void 0 : filterOptions.sortBy) {
+                if (
+                    filterOptions === null || filterOptions === void 0
+                        ? void 0
+                        : filterOptions.sortBy
+                ) {
                     const direction = filterOptions.sortDirection || 'desc';
                     switch (filterOptions.sortBy) {
                         case 'priority':
@@ -139,8 +177,7 @@ class TaskService {
                         default:
                             orderBy.createdAt = direction;
                     }
-                }
-                else {
+                } else {
                     orderBy.createdAt = 'desc';
                 }
                 const tasks = yield prisma.task.findMany({
@@ -158,8 +195,7 @@ class TaskService {
                     },
                 });
                 return tasks;
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Get tasks error:', error);
                 throw error;
             }
@@ -200,8 +236,7 @@ class TaskService {
                     return null;
                 }
                 return task;
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Get task by ID error:', error);
                 throw error;
             }
@@ -232,7 +267,9 @@ class TaskService {
                     throw new Error('Task not found');
                 }
                 if (existingTask.createdById !== userId) {
-                    throw new Error('You do not have permission to update this task');
+                    throw new Error(
+                        'You do not have permission to update this task',
+                    );
                 }
                 if (updateTaskDto.categoryId !== undefined) {
                     const category = yield prisma.taskCategory.findUnique({
@@ -255,17 +292,41 @@ class TaskService {
                     where: {
                         id: taskId,
                     },
-                    data: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (updateTaskDto.title && { title: updateTaskDto.title })), (updateTaskDto.description !== undefined && {
-                        description: updateTaskDto.description,
-                    })), (updateTaskDto.status && {
-                        status: updateTaskDto.status,
-                    })), (updateTaskDto.priorityId !== undefined && {
-                        priorityId: Number(updateTaskDto.priorityId),
-                    })), (updateTaskDto.categoryId !== undefined && {
-                        categoryId: Number(updateTaskDto.categoryId),
-                    })), (updateTaskDto.dueDate !== undefined && {
-                        dueDate: updateTaskDto.dueDate,
-                    })),
+                    data: Object.assign(
+                        Object.assign(
+                            Object.assign(
+                                Object.assign(
+                                    Object.assign(
+                                        Object.assign(
+                                            {},
+                                            updateTaskDto.title && {
+                                                title: updateTaskDto.title,
+                                            },
+                                        ),
+                                        updateTaskDto.description !==
+                                            undefined && {
+                                            description:
+                                                updateTaskDto.description,
+                                        },
+                                    ),
+                                    updateTaskDto.status && {
+                                        status: updateTaskDto.status,
+                                    },
+                                ),
+                                updateTaskDto.priorityId !== undefined && {
+                                    priorityId: Number(
+                                        updateTaskDto.priorityId,
+                                    ),
+                                },
+                            ),
+                            updateTaskDto.categoryId !== undefined && {
+                                categoryId: Number(updateTaskDto.categoryId),
+                            },
+                        ),
+                        updateTaskDto.dueDate !== undefined && {
+                            dueDate: updateTaskDto.dueDate,
+                        },
+                    ),
                     include: {
                         category: true,
                         priority: true,
@@ -278,8 +339,7 @@ class TaskService {
                     },
                 });
                 return updatedTask;
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Update task error:', error);
                 throw error;
             }
@@ -309,7 +369,9 @@ class TaskService {
                     throw new Error('Task not found');
                 }
                 if (existingTask.createdById !== userId) {
-                    throw new Error('You do not have permission to delete this task');
+                    throw new Error(
+                        'You do not have permission to delete this task',
+                    );
                 }
                 const deletedTask = yield prisma.task.delete({
                     where: {
@@ -327,8 +389,7 @@ class TaskService {
                     },
                 });
                 return deletedTask;
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Delete task error:', error);
                 throw error;
             }

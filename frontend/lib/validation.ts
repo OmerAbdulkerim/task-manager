@@ -56,9 +56,7 @@ export const userSchema = z.object({
     .min(2, { message: 'Name must be at least 2 characters long' })
     .max(100, { message: 'Name must be less than 100 characters' })
     .optional(),
-  roleId: z
-    .union([z.string(), z.number()])
-    .refine((val) => val !== '', { message: 'Please select a role' }),
+  roleId: z.number().int().positive({ message: 'Please select a valid role' }),
 });
 
 export type UserFormValues = z.infer<typeof userSchema>;

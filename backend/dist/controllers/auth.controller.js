@@ -1,16 +1,42 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
+var __awaiter =
+    (this && this.__awaiter) ||
+    function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+            return value instanceof P
+                ? value
+                : new P(function (resolve) {
+                      resolve(value);
+                  });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator['throw'](value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : adopt(result.value).then(fulfilled, rejected);
+            }
+            step(
+                (generator = generator.apply(thisArg, _arguments || [])).next(),
+            );
+        });
+    };
+Object.defineProperty(exports, '__esModule', { value: true });
 exports.AuthController = void 0;
-const auth_service_1 = require("../services/auth.service");
+const auth_service_1 = require('../services/auth.service');
 const authService = new auth_service_1.AuthService();
 class AuthController {
     /**
@@ -38,8 +64,7 @@ class AuthController {
                     message: 'User registered successfully',
                     data: result,
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Registration error:', error);
                 res.status(400).json({
                     status: 'error',
@@ -80,8 +105,7 @@ class AuthController {
                         accessToken: result.accessToken,
                     },
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Login error:', error);
                 res.status(401).json({
                     status: 'error',
@@ -127,8 +151,7 @@ class AuthController {
                         user: result.user,
                     },
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Refresh token error:', error);
                 res.status(401).json({
                     status: 'error',
@@ -161,8 +184,7 @@ class AuthController {
                     status: 'success',
                     message: 'Logged out successfully',
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Logout error:', error);
                 res.status(500).json({
                     status: 'error',
@@ -203,8 +225,7 @@ class AuthController {
                     },
                 },
             });
-        }
-        catch (error) {
+        } catch (error) {
             console.error('Get user error:', error);
             res.status(500).json({
                 status: 'error',

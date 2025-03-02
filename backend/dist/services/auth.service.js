@@ -1,22 +1,50 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
+var __awaiter =
+    (this && this.__awaiter) ||
+    function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+            return value instanceof P
+                ? value
+                : new P(function (resolve) {
+                      resolve(value);
+                  });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator['throw'](value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : adopt(result.value).then(fulfilled, rejected);
+            }
+            step(
+                (generator = generator.apply(thisArg, _arguments || [])).next(),
+            );
+        });
+    };
+var __importDefault =
+    (this && this.__importDefault) ||
+    function (mod) {
+        return mod && mod.__esModule ? mod : { default: mod };
+    };
+Object.defineProperty(exports, '__esModule', { value: true });
 exports.AuthService = void 0;
-const client_1 = require("@prisma/client");
-const bcrypt_1 = __importDefault(require("bcrypt"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const jwt_config_1 = require("../config/jwt.config");
+const client_1 = require('@prisma/client');
+const bcrypt_1 = __importDefault(require('bcrypt'));
+const jsonwebtoken_1 = __importDefault(require('jsonwebtoken'));
+const jwt_config_1 = require('../config/jwt.config');
 const prisma = new client_1.PrismaClient();
 class AuthService {
     /**
@@ -37,45 +65,57 @@ class AuthService {
      * @returns The registration response
      */
     register(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ email, password, roleId, }) {
-            try {
-                const existingUser = yield prisma.user.findUnique({
-                    where: { email },
-                });
-                if (existingUser) {
-                    throw new Error('User with this email already exists');
+        return __awaiter(
+            this,
+            arguments,
+            void 0,
+            function* ({ email, password, roleId }) {
+                try {
+                    const existingUser = yield prisma.user.findUnique({
+                        where: { email },
+                    });
+                    if (existingUser) {
+                        throw new Error('User with this email already exists');
+                    }
+                    const role = yield prisma.role.findUnique({
+                        where: { id: roleId },
+                    });
+                    if (!role) {
+                        throw new Error('Invalid role ID');
+                    }
+                    const salt = yield bcrypt_1.default.genSalt(10);
+                    const hashedPassword = yield bcrypt_1.default.hash(
+                        password,
+                        salt,
+                    );
+                    const user = yield prisma.user.create({
+                        data: {
+                            email,
+                            password: hashedPassword,
+                            roleId,
+                        },
+                        include: {
+                            role: true,
+                        },
+                    });
+                    const tokens = this.generateTokens(user.id);
+                    yield this.saveRefreshToken(user.id, tokens.refreshToken);
+                    return Object.assign(
+                        {
+                            user: {
+                                id: user.id,
+                                email: user.email,
+                                role: user.role,
+                            },
+                        },
+                        tokens,
+                    );
+                } catch (error) {
+                    console.error('Registration service error:', error);
+                    throw error;
                 }
-                const role = yield prisma.role.findUnique({
-                    where: { id: roleId },
-                });
-                if (!role) {
-                    throw new Error('Invalid role ID');
-                }
-                const salt = yield bcrypt_1.default.genSalt(10);
-                const hashedPassword = yield bcrypt_1.default.hash(password, salt);
-                const user = yield prisma.user.create({
-                    data: {
-                        email,
-                        password: hashedPassword,
-                        roleId,
-                    },
-                    include: {
-                        role: true,
-                    },
-                });
-                const tokens = this.generateTokens(user.id);
-                yield this.saveRefreshToken(user.id, tokens.refreshToken);
-                return Object.assign({ user: {
-                        id: user.id,
-                        email: user.email,
-                        role: user.role,
-                    } }, tokens);
-            }
-            catch (error) {
-                console.error('Registration service error:', error);
-                throw error;
-            }
-        });
+            },
+        );
     }
     /**
      * Login a user
@@ -89,34 +129,46 @@ class AuthService {
      * @returns The login response
      */
     login(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ email, password }) {
-            try {
-                const user = yield prisma.user.findUnique({
-                    where: { email },
-                    include: {
-                        role: true,
-                    },
-                });
-                if (!user) {
-                    throw new Error('Invalid email or password');
+        return __awaiter(
+            this,
+            arguments,
+            void 0,
+            function* ({ email, password }) {
+                try {
+                    const user = yield prisma.user.findUnique({
+                        where: { email },
+                        include: {
+                            role: true,
+                        },
+                    });
+                    if (!user) {
+                        throw new Error('Invalid email or password');
+                    }
+                    const isPasswordValid = yield bcrypt_1.default.compare(
+                        password,
+                        user.password,
+                    );
+                    if (!isPasswordValid) {
+                        throw new Error('Invalid email or password');
+                    }
+                    const tokens = this.generateTokens(user.id);
+                    yield this.saveRefreshToken(user.id, tokens.refreshToken);
+                    return Object.assign(
+                        {
+                            user: {
+                                id: user.id,
+                                email: user.email,
+                                role: user.role,
+                            },
+                        },
+                        tokens,
+                    );
+                } catch (error) {
+                    console.error('Login service error:', error);
+                    throw error;
                 }
-                const isPasswordValid = yield bcrypt_1.default.compare(password, user.password);
-                if (!isPasswordValid) {
-                    throw new Error('Invalid email or password');
-                }
-                const tokens = this.generateTokens(user.id);
-                yield this.saveRefreshToken(user.id, tokens.refreshToken);
-                return Object.assign({ user: {
-                        id: user.id,
-                        email: user.email,
-                        role: user.role,
-                    } }, tokens);
-            }
-            catch (error) {
-                console.error('Login service error:', error);
-                throw error;
-            }
-        });
+            },
+        );
     }
     /**
      * Refresh access token using refresh token
@@ -138,7 +190,10 @@ class AuthService {
     refreshToken(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const decoded = jsonwebtoken_1.default.verify(refreshToken, jwt_config_1.JWT_CONFIG.REFRESH_TOKEN.SECRET);
+                const decoded = jsonwebtoken_1.default.verify(
+                    refreshToken,
+                    jwt_config_1.JWT_CONFIG.REFRESH_TOKEN.SECRET,
+                );
                 const tokenRecord = yield prisma.refreshToken.findFirst({
                     where: {
                         userId: decoded.userId,
@@ -165,14 +220,21 @@ class AuthService {
                     where: { id: tokenRecord.id },
                     data: { revoked: true },
                 });
-                yield this.saveRefreshToken(decoded.userId, tokens.refreshToken);
-                return Object.assign({ user: {
-                        id: tokenRecord.user.id,
-                        email: tokenRecord.user.email,
-                        role: tokenRecord.user.role,
-                    } }, tokens);
-            }
-            catch (error) {
+                yield this.saveRefreshToken(
+                    decoded.userId,
+                    tokens.refreshToken,
+                );
+                return Object.assign(
+                    {
+                        user: {
+                            id: tokenRecord.user.id,
+                            email: tokenRecord.user.email,
+                            role: tokenRecord.user.role,
+                        },
+                    },
+                    tokens,
+                );
+            } catch (error) {
                 console.error('Refresh token error:', error);
                 throw error;
             }
@@ -191,7 +253,10 @@ class AuthService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 // Verify the refresh token
-                const decoded = jsonwebtoken_1.default.verify(refreshToken, jwt_config_1.JWT_CONFIG.REFRESH_TOKEN.SECRET);
+                const decoded = jsonwebtoken_1.default.verify(
+                    refreshToken,
+                    jwt_config_1.JWT_CONFIG.REFRESH_TOKEN.SECRET,
+                );
                 // Revoke the refresh token
                 yield prisma.refreshToken.updateMany({
                     where: {
@@ -202,8 +267,7 @@ class AuthService {
                     data: { revoked: true },
                 });
                 return true;
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Logout error:', error);
                 // Even if token verification fails, we consider logout successful
                 return true;
@@ -230,10 +294,19 @@ class AuthService {
      * @returns The generated tokens
      */
     generateTokens(userId) {
-        const tokenId = Math.random().toString(36).substring(2, 15) +
+        const tokenId =
+            Math.random().toString(36).substring(2, 15) +
             Math.random().toString(36).substring(2, 15);
-        const accessToken = jsonwebtoken_1.default.sign({ userId }, jwt_config_1.JWT_CONFIG.ACCESS_TOKEN.SECRET, { expiresIn: jwt_config_1.JWT_CONFIG.ACCESS_TOKEN.EXPIRES_IN });
-        const refreshToken = jsonwebtoken_1.default.sign({ userId, tokenId }, jwt_config_1.JWT_CONFIG.REFRESH_TOKEN.SECRET, { expiresIn: jwt_config_1.JWT_CONFIG.REFRESH_TOKEN.EXPIRES_IN });
+        const accessToken = jsonwebtoken_1.default.sign(
+            { userId },
+            jwt_config_1.JWT_CONFIG.ACCESS_TOKEN.SECRET,
+            { expiresIn: jwt_config_1.JWT_CONFIG.ACCESS_TOKEN.EXPIRES_IN },
+        );
+        const refreshToken = jsonwebtoken_1.default.sign(
+            { userId, tokenId },
+            jwt_config_1.JWT_CONFIG.REFRESH_TOKEN.SECRET,
+            { expiresIn: jwt_config_1.JWT_CONFIG.REFRESH_TOKEN.EXPIRES_IN },
+        );
         return { accessToken, refreshToken };
     }
     /**
@@ -252,7 +325,10 @@ class AuthService {
             try {
                 const decoded = jsonwebtoken_1.default.decode(refreshToken);
                 const expiresAt = new Date(decoded.exp * 1000);
-                const { tokenId } = jsonwebtoken_1.default.verify(refreshToken, jwt_config_1.JWT_CONFIG.REFRESH_TOKEN.SECRET);
+                const { tokenId } = jsonwebtoken_1.default.verify(
+                    refreshToken,
+                    jwt_config_1.JWT_CONFIG.REFRESH_TOKEN.SECRET,
+                );
                 yield prisma.refreshToken.create({
                     data: {
                         id: tokenId,
@@ -260,8 +336,7 @@ class AuthService {
                         expiresAt,
                     },
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Save refresh token error:', error);
                 throw error;
             }

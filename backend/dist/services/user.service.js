@@ -1,20 +1,48 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
+var __awaiter =
+    (this && this.__awaiter) ||
+    function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+            return value instanceof P
+                ? value
+                : new P(function (resolve) {
+                      resolve(value);
+                  });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator['throw'](value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : adopt(result.value).then(fulfilled, rejected);
+            }
+            step(
+                (generator = generator.apply(thisArg, _arguments || [])).next(),
+            );
+        });
+    };
+var __importDefault =
+    (this && this.__importDefault) ||
+    function (mod) {
+        return mod && mod.__esModule ? mod : { default: mod };
+    };
+Object.defineProperty(exports, '__esModule', { value: true });
 exports.UserService = void 0;
-const client_1 = require("@prisma/client");
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const client_1 = require('@prisma/client');
+const bcrypt_1 = __importDefault(require('bcrypt'));
 const prisma = new client_1.PrismaClient();
 class UserService {
     /**
@@ -43,8 +71,7 @@ class UserService {
                     roleId: user.roleId,
                     role: user.role,
                 }));
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Get all users service error:', error);
                 throw error;
             }
@@ -75,8 +102,7 @@ class UserService {
                     roleId: user.roleId,
                     role: user.role,
                 };
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Get user by ID service error:', error);
                 throw error;
             }
@@ -104,7 +130,10 @@ class UserService {
                     throw new Error('Invalid role ID');
                 }
                 const salt = yield bcrypt_1.default.genSalt(10);
-                const hashedPassword = yield bcrypt_1.default.hash(userData.password, salt);
+                const hashedPassword = yield bcrypt_1.default.hash(
+                    userData.password,
+                    salt,
+                );
                 const user = yield prisma.user.create({
                     data: {
                         email: userData.email,
@@ -122,8 +151,7 @@ class UserService {
                     roleId: user.roleId,
                     role: user.role,
                 };
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Create user service error:', error);
                 throw error;
             }
@@ -171,10 +199,16 @@ class UserService {
                 // Only hash password if it's being updated
                 if (userData.password) {
                     const salt = yield bcrypt_1.default.genSalt(10);
-                    updateData.password = yield bcrypt_1.default.hash(userData.password, salt);
+                    updateData.password = yield bcrypt_1.default.hash(
+                        userData.password,
+                        salt,
+                    );
                 }
                 // Remove undefined fields
-                Object.keys(updateData).forEach((key) => updateData[key] === undefined && delete updateData[key]);
+                Object.keys(updateData).forEach(
+                    (key) =>
+                        updateData[key] === undefined && delete updateData[key],
+                );
                 const updatedUser = yield prisma.user.update({
                     where: { id },
                     data: updateData,
@@ -189,8 +223,7 @@ class UserService {
                     roleId: updatedUser.roleId,
                     role: updatedUser.role,
                 };
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Update user service error:', error);
                 throw error;
             }
@@ -215,8 +248,7 @@ class UserService {
                     where: { id },
                 });
                 return { message: 'User deleted successfully' };
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Delete user service error:', error);
                 throw error;
             }
@@ -235,8 +267,7 @@ class UserService {
                         id: 'asc',
                     },
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Get all roles service error:', error);
                 throw error;
             }

@@ -1,19 +1,45 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
+var __awaiter =
+    (this && this.__awaiter) ||
+    function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+            return value instanceof P
+                ? value
+                : new P(function (resolve) {
+                      resolve(value);
+                  });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator['throw'](value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : adopt(result.value).then(fulfilled, rejected);
+            }
+            step(
+                (generator = generator.apply(thisArg, _arguments || [])).next(),
+            );
+        });
+    };
+Object.defineProperty(exports, '__esModule', { value: true });
 exports.TaskController = void 0;
-const task_service_1 = require("../services/task.service");
-const task_dto_1 = require("../dtos/task.dto");
-const class_transformer_1 = require("class-transformer");
-const class_validator_1 = require("class-validator");
+const task_service_1 = require('../services/task.service');
+const task_dto_1 = require('../dtos/task.dto');
+const class_transformer_1 = require('class-transformer');
+const class_validator_1 = require('class-validator');
 const taskService = new task_service_1.TaskService();
 class TaskController {
     /**
@@ -38,8 +64,7 @@ class TaskController {
                         task,
                     },
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Create task error:', error);
                 res.status(400).json({
                     status: 'error',
@@ -67,13 +92,17 @@ class TaskController {
             try {
                 const userId = req.user.id;
                 // Extract filter and sort parameters from query
-                const filterOptions = (0, class_transformer_1.plainToClass)(task_dto_1.TaskFilterDto, req.query);
+                const filterOptions = (0, class_transformer_1.plainToClass)(
+                    task_dto_1.TaskFilterDto,
+                    req.query,
+                );
                 // Validate filter options if any were provided
                 if (Object.keys(req.query).length > 0) {
                     try {
-                        yield (0, class_validator_1.validateOrReject)(filterOptions);
-                    }
-                    catch (validationErrors) {
+                        yield (0, class_validator_1.validateOrReject)(
+                            filterOptions,
+                        );
+                    } catch (validationErrors) {
                         return res.status(400).json({
                             status: 'error',
                             message: 'Invalid filter parameters',
@@ -90,8 +119,7 @@ class TaskController {
                         count: tasks.length,
                     },
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Get tasks error:', error);
                 res.status(500).json({
                     status: 'error',
@@ -119,7 +147,8 @@ class TaskController {
                 if (!task) {
                     res.status(404).json({
                         status: 'error',
-                        message: 'Task not found or you do not have permission to view it',
+                        message:
+                            'Task not found or you do not have permission to view it',
                     });
                     return;
                 }
@@ -129,8 +158,7 @@ class TaskController {
                         task,
                     },
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Get task by ID error:', error);
                 res.status(500).json({
                     status: 'error',
@@ -155,7 +183,11 @@ class TaskController {
                 const userId = req.user.id;
                 const taskId = req.params.id;
                 const taskData = req.body;
-                const updatedTask = yield taskService.updateTask(taskId, taskData, userId);
+                const updatedTask = yield taskService.updateTask(
+                    taskId,
+                    taskData,
+                    userId,
+                );
                 res.status(200).json({
                     status: 'success',
                     message: 'Task updated successfully',
@@ -163,8 +195,7 @@ class TaskController {
                         task: updatedTask,
                     },
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Update task error:', error);
                 if (error.message.includes('permission')) {
                     res.status(403).json({
@@ -207,8 +238,7 @@ class TaskController {
                     status: 'success',
                     message: 'Task deleted successfully',
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Delete task error:', error);
                 if (error.message.includes('permission')) {
                     res.status(403).json({

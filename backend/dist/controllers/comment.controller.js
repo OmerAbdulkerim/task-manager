@@ -1,16 +1,42 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
+var __awaiter =
+    (this && this.__awaiter) ||
+    function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+            return value instanceof P
+                ? value
+                : new P(function (resolve) {
+                      resolve(value);
+                  });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator['throw'](value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : adopt(result.value).then(fulfilled, rejected);
+            }
+            step(
+                (generator = generator.apply(thisArg, _arguments || [])).next(),
+            );
+        });
+    };
+Object.defineProperty(exports, '__esModule', { value: true });
 exports.CommentController = void 0;
-const comment_service_1 = require("../services/comment.service");
+const comment_service_1 = require('../services/comment.service');
 // Initialize CommentService
 const commentService = new comment_service_1.CommentService();
 class CommentController {
@@ -28,10 +54,10 @@ class CommentController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { taskId } = req.params;
-                const comments = yield commentService.getCommentsByTaskId(taskId);
+                const comments =
+                    yield commentService.getCommentsByTaskId(taskId);
                 res.status(200).json({ status: 'success', data: { comments } });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Get comments by task ID error:', error);
                 res.status(500).json({
                     status: 'error',
@@ -56,8 +82,7 @@ class CommentController {
                 const { id } = req.params;
                 const comment = yield commentService.getCommentById(id);
                 res.status(200).json({ status: 'success', data: { comment } });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Get comment by ID error:', error);
                 res.status(404).json({
                     status: 'error',
@@ -81,7 +106,8 @@ class CommentController {
             var _a;
             try {
                 // Get user ID from the authenticated user
-                const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+                const userId =
+                    (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
                 if (!userId) {
                     return res.status(401).json({
                         status: 'error',
@@ -92,14 +118,16 @@ class CommentController {
                 if (!req.body.createdById) {
                     req.body.createdById = userId;
                 }
-                const comment = yield commentService.createComment(userId, req.body);
+                const comment = yield commentService.createComment(
+                    userId,
+                    req.body,
+                );
                 res.status(201).json({
                     status: 'success',
                     message: 'Comment created successfully',
                     data: { comment },
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Create comment error:', error);
                 res.status(400).json({
                     status: 'error',
@@ -124,7 +152,8 @@ class CommentController {
             var _a;
             try {
                 // Get user ID from the authenticated user
-                const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+                const userId =
+                    (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
                 if (!userId) {
                     return res.status(401).json({
                         status: 'error',
@@ -132,22 +161,24 @@ class CommentController {
                     });
                 }
                 const { id } = req.params;
-                const comment = yield commentService.updateComment(id, userId, req.body);
+                const comment = yield commentService.updateComment(
+                    id,
+                    userId,
+                    req.body,
+                );
                 res.status(200).json({
                     status: 'success',
                     message: 'Comment updated successfully',
                     data: { comment },
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Update comment error:', error);
                 // Differentiate between not found and permission errors
                 if (error.message.includes('not found')) {
                     return res
                         .status(404)
                         .json({ status: 'error', message: error.message });
-                }
-                else if (error.message.includes('can only update your own')) {
+                } else if (error.message.includes('can only update your own')) {
                     return res
                         .status(403)
                         .json({ status: 'error', message: error.message });
@@ -175,7 +206,8 @@ class CommentController {
             var _a;
             try {
                 // Get user ID from the authenticated user
-                const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+                const userId =
+                    (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
                 if (!userId) {
                     return res.status(401).json({
                         status: 'error',
@@ -188,16 +220,14 @@ class CommentController {
                     status: 'success',
                     message: 'Comment deleted successfully',
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Delete comment error:', error);
                 // Differentiate between not found and permission errors
                 if (error.message.includes('not found')) {
                     return res
                         .status(404)
                         .json({ status: 'error', message: error.message });
-                }
-                else if (error.message.includes('can only delete')) {
+                } else if (error.message.includes('can only delete')) {
                     return res
                         .status(403)
                         .json({ status: 'error', message: error.message });

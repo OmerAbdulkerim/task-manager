@@ -46,14 +46,14 @@ export interface CreateUserDto {
   email: string;
   password: string;
   name?: string;
-  roleId: number | string;
+  roleId: number;
 }
 
 export interface UpdateUserDto {
   email?: string;
   password?: string;
   name?: string;
-  roleId?: number | string;
+  roleId?: number;
 }
 
 /**

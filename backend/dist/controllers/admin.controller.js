@@ -1,16 +1,42 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
+var __awaiter =
+    (this && this.__awaiter) ||
+    function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+            return value instanceof P
+                ? value
+                : new P(function (resolve) {
+                      resolve(value);
+                  });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator['throw'](value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done
+                    ? resolve(result.value)
+                    : adopt(result.value).then(fulfilled, rejected);
+            }
+            step(
+                (generator = generator.apply(thisArg, _arguments || [])).next(),
+            );
+        });
+    };
+Object.defineProperty(exports, '__esModule', { value: true });
 exports.AdminController = void 0;
-const user_service_1 = require("../services/user.service");
+const user_service_1 = require('../services/user.service');
 const userService = new user_service_1.UserService();
 class AdminController {
     /**
@@ -31,8 +57,7 @@ class AdminController {
                     status: 'success',
                     data: { users },
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Get all users error:', error);
                 res.status(500).json({
                     status: 'error',
@@ -60,13 +85,14 @@ class AdminController {
                     status: 'success',
                     data: { user },
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Get user by ID error:', error);
-                res.status(error.message === 'User not found' ? 404 : 500).json({
-                    status: 'error',
-                    message: error.message || 'Failed to get user',
-                });
+                res.status(error.message === 'User not found' ? 404 : 500).json(
+                    {
+                        status: 'error',
+                        message: error.message || 'Failed to get user',
+                    },
+                );
             }
         });
     }
@@ -94,8 +120,7 @@ class AdminController {
                     message: 'User created successfully',
                     data: { user },
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Create user error:', error);
                 res.status(400).json({
                     status: 'error',
@@ -121,25 +146,23 @@ class AdminController {
                 const { email, password, roleId } = req.body;
                 // Create update data object with optional fields
                 const updateData = {};
-                if (email !== undefined)
-                    updateData.email = email;
-                if (password !== undefined)
-                    updateData.password = password;
-                if (roleId !== undefined)
-                    updateData.roleId = Number(roleId);
+                if (email !== undefined) updateData.email = email;
+                if (password !== undefined) updateData.password = password;
+                if (roleId !== undefined) updateData.roleId = Number(roleId);
                 const user = yield userService.updateUser(id, updateData);
                 res.status(200).json({
                     status: 'success',
                     message: 'User updated successfully',
                     data: { user },
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Update user error:', error);
-                res.status(error.message === 'User not found' ? 404 : 400).json({
-                    status: 'error',
-                    message: error.message || 'Failed to update user',
-                });
+                res.status(error.message === 'User not found' ? 404 : 400).json(
+                    {
+                        status: 'error',
+                        message: error.message || 'Failed to update user',
+                    },
+                );
             }
         });
     }
@@ -162,13 +185,14 @@ class AdminController {
                     status: 'success',
                     message: 'User deleted successfully',
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Delete user error:', error);
-                res.status(error.message === 'User not found' ? 404 : 500).json({
-                    status: 'error',
-                    message: error.message || 'Failed to delete user',
-                });
+                res.status(error.message === 'User not found' ? 404 : 500).json(
+                    {
+                        status: 'error',
+                        message: error.message || 'Failed to delete user',
+                    },
+                );
             }
         });
     }
@@ -190,8 +214,7 @@ class AdminController {
                     status: 'success',
                     data: { roles },
                 });
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Get all roles error:', error);
                 res.status(500).json({
                     status: 'error',
